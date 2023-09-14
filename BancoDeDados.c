@@ -18,15 +18,20 @@ void createDatabase(TpBancoDeDados **pontBd) {
 			*pontBd = newDatabase(palavra);
 		}
 		
-		if(strstr(string, "CREATE TABLE")) {
+	if(strstr(string, "CREATE TABLE")) {
 			retornaPalavra(string, 3, palavra);
 			newTable(&(*pontBd)->pTabelas, palavra);
 			//puts((*pontBd)->pTabelas->pCampos);
 				
 			fscanf(ptrArq, "%[^\n]\n", string);
 			while(strcmp(string,");") != 0) {
-				newCampo(&(*pontBd)->pTabelas->pCampos, string);		
-				fscanf(ptrArq, "%[^\n]\n", string); 				
+				if(strstr(string, "PRIMARY KEY")) {
+				printf("Define pk\n");
+				//	definePk(*pontBd, string);
+				}
+				else
+					newCampo(&(*pontBd)->pTabelas->pCampos, string);		
+				fscanf(ptrArq, "%[^\n]\n", string); 
 			}
 		}
 		if(strstr(string,"ALTER TABLE" ))
@@ -43,12 +48,12 @@ int main(void) {
 	createDatabase(&pontBd);
 	//retornaPalavra("CREATE DATABASE db_locadora", , palavra);
     //puts(palavra);
- 
-    if(pontBd->pTabelas->pCampos == NULL)
-    	printf("erro!");
-    printf("%s\n", pontBd->pTabelas->pCampos->nome);
-	printf("%s\n", pontBd->pTabelas->pCampos->prox->nome);
-	printf("%s\n", pontBd->pTabelas->pCampos->prox->prox->nome);
-	printf("%s\n", pontBd->pTabelas->pCampos->prox->prox->prox->nome);
+    	
+//    printf("%c, %s\n", pontBd->pTabelas->pCampos->pk, pontBd->pTabelas->pCampos->nome);
+//	printf("%c\n", pontBd->pTabelas->pCampos->prox->pk);
+//	printf("%c\n", pontBd->pTabelas->pCampos->prox->prox->pk);
+//	printf("%c\n", pontBd->pTabelas->pCampos->prox->prox->prox->pk);
+	
 	return 0;
 }
+

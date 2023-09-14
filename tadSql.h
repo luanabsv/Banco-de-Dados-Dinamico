@@ -53,6 +53,24 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 	strcpy(palavra, newPalavra);	
 }
 
+/*void definePk(TpBancoDeDados *pBanco, char string[]) {
+	TpColuna *coluna;
+	char pk[30];
+	coluna = pBanco->pTabelas->pCampos;
+	retornaPalavra(string, 5, pk);
+	
+	while(coluna->prox != NULL) {
+		if(strstr(pk, coluna->nome))
+		{
+			
+			coluna->pk = 'S';
+		}
+		else
+			coluna->pk = 'N';
+			printf("%c, %s", coluna->pk, coluna->nome);
+		coluna = coluna->prox;
+	}
+}*/
 
 TpBancoDeDados *newDatabase(char name[]) {
 	TpBancoDeDados *banco;
@@ -75,9 +93,9 @@ void newTable(TpTabela **pTabelas, char name[]) {
 	
 	if (*pTabelas == NULL) {
 		*pTabelas = novaTabela;
-	}
+	} 
 	else {
-		while (aux->prox != NULL)
+		while (aux->prox != NULL) 
 			aux = aux->prox;
 		aux->prox = novaTabela;
 		novaTabela->ant = aux;
