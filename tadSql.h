@@ -5,28 +5,145 @@ union unionDados{
 };
 
 struct tpDado {
-	union valor;
-	tpDado *prox;
-}
+	union unionDados valor;
+	struct tpDado *prox;
+};
+typedef struct tpDado TpDado;
 
 struct tpColuna {
-	tpColuna *prox, *fk;
-	char campo[20], tipo, pk;
-	tpDado *pAtual, *pDados;
+	struct tpColuna *prox, *fk;
+	char nome[20], tipo, pk;
+	TpDado *pAtual, *pDados;
 };
-typedef struct tpColuna Coluna;
+typedef struct tpColuna TpColuna;
 
 struct tpTabela {
-	struct tpTabela *ant, *prox;
-	struct tpColuna *pCampo;
-	char tabela[20]; 
+	struct TpTabela *ant, *prox;
+	TpColuna *pCampos;
+	char nome[20]; 
 };
-typedef struct tpTabela Tabela;
+typedef struct tpTabela TpTabela;
 
 struct tpBanco {
-	char banco[20];
-	tpTabela *pTabela;
+	char nome[20];
+	TpTabela *pTabelas;
 };
-typedef struct tpBanco Banco;
+typedef struct tpBanco TpBancoDeDados;
+
+void retornaPalavra(char string[], int index, char palavra[]) {
+	int i = 0, len, indexWord = 1, iPalavra = 0;
+	char newPalavra[30];
+	len = strlen(string);
+	
+	while(i < len) {
+		if(string[i] == ' ')
+			indexWord++;
+		
+			
+		if(indexWord == index) {
+			if(string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 40 || string[i] == 41 ) {
+				newPalavra[iPalavra] = string[i];
+				iPalavra++;
+			}
+		}
+		
+		i++;
+	}
+	newPalavra[iPalavra] = '\0';
+	strcpy(palavra, newPalavra);	
+}
+
+/*void definePk(TpBancoDeDados *pBanco, char string[]) {
+	TpColuna *coluna;
+	char pk[30];
+	coluna = pBanco->pTabelas->pCampos;
+	retornaPalavra(string, 5, pk);
+	
+	while(coluna->prox != NULL) {
+		if(strstr(pk, coluna->nome))
+		{
+			
+			coluna->pk = 'S';
+		}
+		else
+			coluna->pk = 'N';
+			printf("%c, %s", coluna->pk, coluna->nome);
+		coluna = coluna->prox;
+	}
+}*/
+
+TpBancoDeDados *newDatabase(char name[]) {
+	TpBancoDeDados *banco;
+	banco = (TpBancoDeDados *)malloc(sizeof(TpBancoDeDados));
+	
+	strcpy(banco->nome, name);
+	banco->pTabelas = NULL;
+	
+	return banco;
+}
+
+void newTable(TpTabela **pTabelas, char name[]) {
+	TpTabela *novaTabela;
+	TpTabela *aux = *pTabelas;
+	novaTabela = (TpTabela *)malloc(sizeof(TpTabela));
+	
+	strcpy(novaTabela->nome, name);
+	novaTabela->pCampos = NULL;
+	novaTabela->prox = novaTabela->ant = NULL;
+	
+	if (*pTabelas == NULL) {
+		*pTabelas = novaTabela;
+	} 
+	else {
+		while (aux->prox != NULL) 
+			aux = aux->prox;
+		aux->prox = novaTabela;
+		novaTabela->ant = aux;
+	}
+}
+
+
+void newCampo(TpColuna **pCampos, char string[]) {
+	TpColuna *novoCampo;
+	TpColuna *aux;
+	char palavra[30];
+	
+	novoCampo = (TpColuna*)malloc(sizeof(TpColuna));
+	aux = *pCampos;
+	
+	retornaPalavra(string, 1, palavra);
+	
+	strcpy(novoCampo->nome, palavra);
+	novoCampo->prox = NULL;
+	novoCampo->fk = NULL;
+
+
+	retornaPalavra(string, 2, palavra);
+	if (strcmp(palavra,"INTEGER") == 0) {
+		novoCampo->tipo = 'I';
+	} 
+	else if (strcmp(palavra,"NUMERIC") == 0) {
+		novoCampo->tipo = 'N';
+	}
+	else if (strcmp(palavra,"DATE") == 0) {
+		novoCampo->tipo = 'D';
+	}
+	else if (strcmp(palavra,"CHARACTER(1)") == 0) {
+		novoCampo->tipo = 'C';
+	}
+	else if (strcmp(palavra,"CHARACTER(20)") == 0) {
+		novoCampo->tipo ='T';
+	}
+	
+	if (*pCampos == NULL) {
+		*pCampos = novoCampo;
+	}
+	else {
+		while (aux->prox != NULL)
+			aux = aux->prox;
+		aux->prox = novoCampo;
+	}
+}
+
 
 
