@@ -52,8 +52,33 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 	newPalavra[iPalavra] = '\0';
 	strcpy(palavra, newPalavra);	
 }
+void defineFk(TpBancoDeDados *pBanco, char string[], char string2[]) {
+	TpColuna *novoCampo;
+	TpTabela *tabelaAdicionar = pBanco->pTabelas;
+	TpTabela *tabelaFk = pBanco->pTabelas;
+	char palavra[30];
+	retornaPalavra(string, 3, palavra);
+	while(strcmp(tabelaAdicionar->nome, palavra) != 0) // Na tabela que será adicionada a FK
+		tabelaAdicionar = tabelaAdicionar->prox;
+	retornaPalavra(string2, 5, palavra);
+	while(strcmp(tabelaFk->nome, palavra) != 0) // Na tabela que está a FK
+		tabelaFk = tabelaFk->prox;
+	
+	TpColuna *FK = tabelaFk->pCampos; // Campos da tabela que tem a FK
+	retornaPalavra(string2, 3, palavra);
+	printf("%s", palavra);
+	while (strcmp(FK->nome, palavra) != 0) {
+		FK = FK->prox; 
+	}
+	novoCampo = (TpColuna*)malloc(sizeof(TpColuna));
+	retornaPalavra(string, 6, palavra);
+	strcpy(novoCampo->nome, palavra); // Nome da FK na tabela nova
+	novoCampo->prox = NULL;
+	novoCampo->fk = FK; // FK apontada
+	novoCampo->pk = 'N';
+}
 
-/*void definePk(TpBancoDeDados *pBanco, char string[]) {
+void definePk(TpBancoDeDados *pBanco, char string[]) {
 	TpColuna *coluna;
 	char pk[30];
 	coluna = pBanco->pTabelas->pCampos;
@@ -70,7 +95,7 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 			printf("%c, %s", coluna->pk, coluna->nome);
 		coluna = coluna->prox;
 	}
-}*/
+}
 
 TpBancoDeDados *newDatabase(char name[]) {
 	TpBancoDeDados *banco;
@@ -82,7 +107,7 @@ TpBancoDeDados *newDatabase(char name[]) {
 	return banco;
 }
 
-void newTable(TpTabela **pTabelas, char name[]) {
+TpTabela *newTable(TpTabela **pTabelas, char name[]) {
 	TpTabela *novaTabela;
 	TpTabela *aux = *pTabelas;
 	novaTabela = (TpTabela *)malloc(sizeof(TpTabela));
@@ -100,8 +125,22 @@ void newTable(TpTabela **pTabelas, char name[]) {
 		aux->prox = novaTabela;
 		novaTabela->ant = aux;
 	}
+	
+	return novaTabela;
 }
 
+void mostraTudo(TpTabela *tabelas) {
+	TpTabela *aux = tabelas;
+	while(aux) {
+		printf("\n%s\n", aux->nome);
+		TpColuna *aux2 = aux->pCampos;
+		while(aux2) {
+			printf("%s\n", aux2->nome);
+			aux2 = aux2->prox;
+		}
+		aux = aux->prox;	
+	}
+}
 
 void newCampo(TpColuna **pCampos, char string[]) {
 	TpColuna *novoCampo;
@@ -116,8 +155,8 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	strcpy(novoCampo->nome, palavra);
 	novoCampo->prox = NULL;
 	novoCampo->fk = NULL;
-
-
+	novoCampo->pk = 'N';
+	printf("criado campo %s\n", palavra);
 	retornaPalavra(string, 2, palavra);
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
