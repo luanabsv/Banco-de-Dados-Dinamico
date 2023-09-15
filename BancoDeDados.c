@@ -22,13 +22,10 @@ void createDatabase(TpBancoDeDados **pontBd) {
 	if(strstr(string, "CREATE TABLE")) {
 			retornaPalavra(string, 3, palavra);
 			tabelaAtual = newTable(&(*pontBd)->pTabelas, palavra);
-			printf("criou %s\n", palavra);
-			//puts((*pontBd)->pTabelas->pCampos);
 			fscanf(ptrArq, "%[^\n]\n", string);
 			while(strcmp(string,");") != 0) {
 				if(strstr(string, "PRIMARY KEY")) {
-					printf("");
-				// definePk(*pontBd, string);
+					definePk(&tabelaAtual, string);
 				}
 				else {
 					newCampo(&tabelaAtual->pCampos, string);
@@ -37,7 +34,6 @@ void createDatabase(TpBancoDeDados **pontBd) {
 			}
 		}
 		if(strstr(string,"ALTER TABLE" )) {
-			printf("Define FK\n");
 			fscanf(ptrArq, "%[^\n]\n", string2); 
 			defineFk(*pontBd, string, string2);
 		}

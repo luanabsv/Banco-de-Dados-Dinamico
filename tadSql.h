@@ -41,7 +41,7 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 		
 			
 		if(indexWord == index) {
-			if(string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 40 || string[i] == 41 ) {
+			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45) {
 				newPalavra[iPalavra] = string[i];
 				iPalavra++;
 			}
@@ -56,45 +56,43 @@ void defineFk(TpBancoDeDados *pBanco, char string[], char string2[]) {
 	TpColuna *novoCampo;
 	TpTabela *tabelaAdicionar = pBanco->pTabelas;
 	TpTabela *tabelaFk = pBanco->pTabelas;
+	
 	char palavra[30];
 	retornaPalavra(string, 3, palavra);
 	while(strcmp(tabelaAdicionar->nome, palavra) != 0) // Na tabela que será adicionada a FK
 		tabelaAdicionar = tabelaAdicionar->prox;
+		
+	TpColuna *aux = tabelaAdicionar->pCampos;
+	
 	retornaPalavra(string2, 5, palavra);
 	while(strcmp(tabelaFk->nome, palavra) != 0) // Na tabela que está a FK
 		tabelaFk = tabelaFk->prox;
 	
 	TpColuna *FK = tabelaFk->pCampos; // Campos da tabela que tem a FK
 	retornaPalavra(string2, 3, palavra);
-	printf("%s", palavra);
 	while (strcmp(FK->nome, palavra) != 0) {
 		FK = FK->prox; 
 	}
+	
 	novoCampo = (TpColuna*)malloc(sizeof(TpColuna));
 	retornaPalavra(string, 6, palavra);
 	strcpy(novoCampo->nome, palavra); // Nome da FK na tabela nova
 	novoCampo->prox = NULL;
 	novoCampo->fk = FK; // FK apontada
 	novoCampo->pk = 'N';
+	
+	while (aux->prox != NULL)
+		aux = aux->prox;
+	aux->prox = novoCampo;
 }
 
-void definePk(TpBancoDeDados *pBanco, char string[]) {
-	TpColuna *coluna;
+void definePk(TpTabela **pTabela, char string[]) {
+	TpColuna *aux = &(*pTabela)->pCampos;
 	char pk[30];
-	coluna = pBanco->pTabelas->pCampos;
 	retornaPalavra(string, 5, pk);
-	
-	while(coluna->prox != NULL) {
-		if(strstr(pk, coluna->nome))
-		{
-			
-			coluna->pk = 'S';
-		}
-		else
-			coluna->pk = 'N';
-			printf("%c, %s", coluna->pk, coluna->nome);
-		coluna = coluna->prox;
-	}
+	while(strcmp(aux->nome,pk) != 0)
+		aux = aux->prox;
+	aux->pk = 'S';
 }
 
 TpBancoDeDados *newDatabase(char name[]) {
@@ -132,13 +130,17 @@ TpTabela *newTable(TpTabela **pTabelas, char name[]) {
 void mostraTudo(TpTabela *tabelas) {
 	TpTabela *aux = tabelas;
 	while(aux) {
-		printf("\n%s\n", aux->nome);
+		printf("%s\n", aux->nome);
 		TpColuna *aux2 = aux->pCampos;
 		while(aux2) {
-			printf("%s\n", aux2->nome);
+			if(!aux2->fk)
+				printf("%s - PK: '%c'\n", aux2->nome, aux2->pk);
+			else
+				printf("%s - FK aponta %s\n", aux2->nome, aux2->fk->nome);
 			aux2 = aux2->prox;
 		}
-		aux = aux->prox;	
+		aux = aux->prox;
+		printf("\n");
 	}
 }
 
@@ -156,7 +158,6 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	novoCampo->prox = NULL;
 	novoCampo->fk = NULL;
 	novoCampo->pk = 'N';
-	printf("criado campo %s\n", palavra);
 	retornaPalavra(string, 2, palavra);
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
