@@ -134,7 +134,7 @@ void mostraTudo(TpTabela *tabelas) {
 		TpColuna *aux2 = aux->pCampos;
 		while(aux2) {
 			if(!aux2->fk)
-				printf("%s - PK: '%c'\n", aux2->nome, aux2->pk);
+				printf("%s - Tipo: %c - PK: '%c'\n", aux2->nome, aux2->tipo, aux2->pk);
 			else
 				printf("%s - FK aponta %s\n", aux2->nome, aux2->fk->nome);
 			aux2 = aux2->prox;
@@ -142,6 +142,29 @@ void mostraTudo(TpTabela *tabelas) {
 		aux = aux->prox;
 		printf("\n");
 	}
+}
+
+void retornaTipo(char string[], int index, char palavra[]) {
+	int i = 0, len, indexWord = 1, iPalavra = 0;
+	char newPalavra[30];
+	len = strlen(string);
+	
+	while(i < len) {
+		if(string[i] == ' ')
+			indexWord++;
+		
+			
+		if(indexWord == index) {
+			if(string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 40 || string[i] == 41 ) {
+				newPalavra[iPalavra] = string[i];
+				iPalavra++;
+			}
+		}
+		
+		i++;
+	}
+	newPalavra[iPalavra] = '\0';
+	strcpy(palavra, newPalavra);	
 }
 
 void newCampo(TpColuna **pCampos, char string[]) {
@@ -158,21 +181,21 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	novoCampo->prox = NULL;
 	novoCampo->fk = NULL;
 	novoCampo->pk = 'N';
-	retornaPalavra(string, 2, palavra);
+	retornaTipo(string, 2, palavra);
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
 	} 
-	else if (strcmp(palavra,"NUMERIC") == 0) {
+	else if (stricmp(palavra,"NUMERIC") == 0) {
 		novoCampo->tipo = 'N';
 	}
-	else if (strcmp(palavra,"DATE") == 0) {
+	else if (stricmp(palavra,"DATE") == 0) {
 		novoCampo->tipo = 'D';
 	}
-	else if (strcmp(palavra,"CHARACTER(1)") == 0) {
+	else if (stricmp(palavra,"CHARACTER(1)") == 0) {
 		novoCampo->tipo = 'C';
 	}
-	else if (strcmp(palavra,"CHARACTER(20)") == 0) {
-		novoCampo->tipo ='T';
+	else if (stricmp(palavra,"CHARACTER(20)") == 0) {
+		novoCampo->tipo = 'T';
 	}
 	
 	if (*pCampos == NULL) {
