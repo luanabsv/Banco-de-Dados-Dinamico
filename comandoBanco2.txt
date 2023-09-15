@@ -1,0 +1,28 @@
+CREATE DATABASE db_hospital;
+CREATE TABLE paciente (
+ nome CHARACTER(20) ,
+ cpf CHARACTER(20) ,
+ celular CHARACTER(20) ,
+ dt_nascimento DATE ,
+ CONSTRAINT PK_paciente PRIMARY KEY (cpf)
+);
+
+CREATE TABLE consulta (
+ id_consulta INTEGER NOT NULL,
+ dt_consulta DATE ,
+ dt_retorno DATE ,
+ CONSTRAINT PK_consulta PRIMARY KEY (id_consulta)
+);
+
+CREATE TABLE medico (
+ crm INTEGER NOT NULL,
+ nome CHARACTER(20) ,
+ cpf CHARACTER(20) ,
+ celular CHARACTER(20) ,
+ dt_nascimento DATE ,
+ CONSTRAINT PK_medico PRIMARY KEY (crm)
+);
+ALTER TABLE consulta ADD CONSTRAINT paciente_cpf
+ FOREIGN KEY (cpf) REFERENCES paciente (cpf);
+ALTER TABLE consulta ADD CONSTRAINT medico_crm
+ FOREIGN KEY (crm) REFERENCES medico (crm);
