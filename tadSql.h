@@ -3,6 +3,7 @@ union unionDados{
 	float n;
 	char c, t[20], d[10];
 };
+typedef union unionDados UnionDados;
 
 struct tpDado {
 	union unionDados valor;
@@ -81,6 +82,8 @@ void defineFk(TpBancoDeDados *pBanco, char string[], char string2[]) {
 	novoCampo->prox = NULL;
 	novoCampo->fk = FK; // FK apontada
 	novoCampo->pk = 'N';
+	novoCampo->tipo = FK->tipo;
+	novoCampo->pDados = NULL;
 	
 	while (aux->prox != NULL)
 		aux = aux->prox;
@@ -170,7 +173,7 @@ void retornaTipo(char string[], int index, char palavra[]) {
 	strcpy(palavra, newPalavra);	
 }
 
-void newDado(TpDado **pDado, char tipo, char dado[20]) {
+void newDado(TpDado **pDado, char tipo, UnionDados dado[20]) {
 	TpDado *novoDado;
 	TpDado *aux = *pDado;
 	novoDado = (TpDado*)malloc(sizeof(TpDado));
@@ -183,14 +186,14 @@ void newDado(TpDado **pDado, char tipo, char dado[20]) {
             strcpy(novoDado->valor.d, dado);
             break;
         case 'C':
-            novoDado->valor.c = dado[0];
+            novoDado->valor.c = dado;
             break;
         case 'I':
             novoDado->valor.i = atoi(dado);
             break;
         case 'N':
             novoDado->valor.n = atof(dado);
-            break;	
+            break;
 	}
 	if(*pDado == NULL)
 		*pDado = novoDado;
@@ -270,8 +273,35 @@ void inserir(TpTabela **pTabelas) {
 }
 
 void mostraDados(TpBancoDeDados *pBanco) {
-	TpTabela *aux = pBanco->pTabelas;
-	
-	printf("%s", aux->pCampos->pDados);
-	printf("%s", aux->pCampos->pDados->prox);
+	TpTabela *auxTab = pBanco->pTabelas;
+	while(auxTab) {
+		printf("\nTabela: %s\n", auxTab->nome);
+		TpColuna *auxCol = auxTab->pCampos;
+		while(auxCol) {
+			printf("-> %s:\n", auxCol->nome);
+			TpDado *auxDado = auxCol->pDados;
+			while(auxDado) {
+				switch(auxCol->tipo) {
+					case 'T':
+			            printf("  -> %s\n", auxDado->valor.t);
+			            break;
+			        case 'D':
+			            printf("  -> %s\n", auxDado->valor.d);
+			            break;
+			        case 'C':
+			            printf("  -> %c\n", auxDado->valor.c);
+			            break;
+			        case 'I':
+			            printf("  -> %d\n", auxDado->valor.i);
+			            break;
+			        case 'N':
+			            printf("  -> %.2f\n", auxDado->valor.n);
+			            break;	
+				}
+				auxDado = auxDado->prox;
+			}
+			auxCol = auxCol->prox;
+		}
+		auxTab = auxTab->prox;
+	}
 }

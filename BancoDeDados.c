@@ -49,6 +49,8 @@ int main(void) {
 	mostraTudo(pontBd);
 	inserir(&pontBd->pTabelas);
 	inserir(&pontBd->pTabelas);
+	inserir(&pontBd->pTabelas);
+	inserir(&pontBd->pTabelas);
 	mostraDados(pontBd);
 	return 0;
 }
