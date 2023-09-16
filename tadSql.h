@@ -41,16 +41,17 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 		
 			
 		if(indexWord == index) {
-			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45) {
+			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 47) {
 				newPalavra[iPalavra] = string[i];
 				iPalavra++;
 			}
 		}
-		
 		i++;
 	}
 	newPalavra[iPalavra] = '\0';
-	strcpy(palavra, newPalavra);	
+	strcpy(palavra, newPalavra);
+	if (indexWord < index)
+		strcpy(palavra, "-404");
 }
 void defineFk(TpBancoDeDados *pBanco, char string[], char string2[]) {
 	TpColuna *novoCampo;
@@ -127,8 +128,10 @@ TpTabela *newTable(TpTabela **pTabelas, char name[]) {
 	return novaTabela;
 }
 
-void mostraTudo(TpTabela *tabelas) {
-	TpTabela *aux = tabelas;
+void mostraTudo(TpBancoDeDados *pBanco) {
+	TpTabela *aux = pBanco->pTabelas;
+	
+	printf("%s\n\n", pBanco->nome);
 	while(aux) {
 		printf("%s\n", aux->nome);
 		TpColuna *aux2 = aux->pCampos;
@@ -167,6 +170,37 @@ void retornaTipo(char string[], int index, char palavra[]) {
 	strcpy(palavra, newPalavra);	
 }
 
+void newDado(TpDado **pDado, char tipo, char dado[20]) {
+	TpDado *novoDado;
+	TpDado *aux = *pDado;
+	novoDado = (TpDado*)malloc(sizeof(TpDado));
+	novoDado->prox = NULL;
+	switch(tipo) {
+		case 'T':
+            strcpy(novoDado->valor.t, dado);
+            break;
+        case 'D':
+            strcpy(novoDado->valor.d, dado);
+            break;
+        case 'C':
+            novoDado->valor.c = dado[0];
+            break;
+        case 'I':
+            novoDado->valor.i = atoi(dado);
+            break;
+        case 'N':
+            novoDado->valor.n = atof(dado);
+            break;	
+	}
+	if(*pDado == NULL)
+		*pDado = novoDado;
+	else {
+		while(aux->prox)
+			aux = aux->prox;
+		aux->prox = novoDado;
+	}
+}
+
 void newCampo(TpColuna **pCampos, char string[]) {
 	TpColuna *novoCampo;
 	TpColuna *aux;
@@ -181,6 +215,8 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	novoCampo->prox = NULL;
 	novoCampo->fk = NULL;
 	novoCampo->pk = 'N';
+	novoCampo->pDados = NULL;
+	novoCampo->pAtual = NULL;
 	retornaTipo(string, 2, palavra);
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
@@ -208,5 +244,34 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	}
 }
 
+void inserir(TpTabela **pTabelas) {
+	char string[100], string2[100], campo[20], dado[20], tabela[20];
+	gets(string);
+	gets(string2);
+	if(strstr(string, "INSERT INTO")) {
+		int i = 4;
+		retornaPalavra(string, i, campo);
+		while(strcmp(campo,"-404") != 0) {
+			retornaPalavra(string, 3, tabela);
+			TpTabela *aux = *pTabelas;
+			while(strcmp(aux->nome, tabela) != 0) {
+				aux = aux->prox;
+			}
+			TpColuna *auxCampos = aux->pCampos;
+			while(strcmp(auxCampos->nome, campo) != 0) {
+				auxCampos = auxCampos->prox;
+			}
+			retornaPalavra(string2, i - 2, dado);
+			newDado(&auxCampos->pDados, auxCampos->tipo, dado);
+			i++;
+			retornaPalavra(string, i, campo);
+		}
+	}
+}
 
-
+void mostraDados(TpBancoDeDados *pBanco) {
+	TpTabela *aux = pBanco->pTabelas;
+	
+	printf("%s", aux->pCampos->pDados);
+	printf("%s", aux->pCampos->pDados->prox);
+}

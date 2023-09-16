@@ -45,17 +45,11 @@ void createDatabase(TpBancoDeDados **pontBd) {
 int main(void) {
 	TpBancoDeDados *pontBd;
 	char palavra[30];
-	//FILE *ptrArq = fopen("comandoBanco.txt", "r");
 	createDatabase(&pontBd);
-	mostraTudo(pontBd->pTabelas);
-	//retornaPalavra("CREATE DATABASE db_locadora", , palavra);
-    //puts(palavra);
-    	
-//    printf("%c, %s\n", pontBd->pTabelas->pCampos->pk, pontBd->pTabelas->pCampos->nome);
-//	printf("%c\n", pontBd->pTabelas->pCampos->prox->pk);
-//	printf("%c\n", pontBd->pTabelas->pCampos->prox->prox->pk);
-//	printf("%c\n", pontBd->pTabelas->pCampos->prox->prox->prox->pk);
-	
+	mostraTudo(pontBd);
+	inserir(&pontBd->pTabelas);
+	inserir(&pontBd->pTabelas);
+	mostraDados(pontBd);
 	return 0;
 }
 

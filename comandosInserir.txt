@@ -1,0 +1,5 @@
+INSERT INTO paciente (nome, cpf, celular, dt_nascimento)
+VALUES (reginaldo, 29132123402, 1899203912, 12/02/1992)
+
+INSERT INTO paciente (nome, cpf, celular, dt_nascimento)
+VALUES (marcio, 29132121402, 1899202112, 12/04/1992)
