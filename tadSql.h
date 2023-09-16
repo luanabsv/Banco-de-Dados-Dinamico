@@ -247,9 +247,9 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	}
 }
 
-void inserir(TpTabela **pTabelas) {
-	char string[100], string2[100], campo[20], dado[20], tabela[20];
-	gets(string);
+void inserir(TpTabela **pTabelas, char string[]) {
+	getch();
+	char string2[100], campo[20], dado[20], tabela[20];
 	gets(string2);
 	if(strstr(string, "INSERT INTO")) {
 		int i = 4;
@@ -272,36 +272,54 @@ void inserir(TpTabela **pTabelas) {
 	}
 }
 
-void mostraDados(TpBancoDeDados *pBanco) {
+int mostraDados(TpBancoDeDados *pBanco) {
+	int x = 3, y = 2, qtdeTab = 0, qtdeDados = 0;
 	TpTabela *auxTab = pBanco->pTabelas;
+	system("cls");
 	while(auxTab) {
-		printf("\nTabela: %s\n", auxTab->nome);
+		x = 3;
+		y = (qtdeTab + qtdeDados) + 1;
+		gotoxy(x, y);
+		printf("Tabela: %s", auxTab->nome);
 		TpColuna *auxCol = auxTab->pCampos;
 		while(auxCol) {
-			printf("-> %s:\n", auxCol->nome);
+			y = (qtdeTab + qtdeDados) + 2;
+			gotoxy(x, y);
+			printf("%s", auxCol->nome);
 			TpDado *auxDado = auxCol->pDados;
 			while(auxDado) {
+				y++;
+				gotoxy(x, y);
 				switch(auxCol->tipo) {
 					case 'T':
-			            printf("  -> %s\n", auxDado->valor.t);
+			            printf("%s", auxDado->valor.t);
 			            break;
 			        case 'D':
-			            printf("  -> %s\n", auxDado->valor.d);
+			            printf("%s", auxDado->valor.d);
 			            break;
 			        case 'C':
-			            printf("  -> %c\n", auxDado->valor.c);
+			            printf("%c", auxDado->valor.c);
 			            break;
 			        case 'I':
-			            printf("  -> %d\n", auxDado->valor.i);
+			            printf("%d", auxDado->valor.i);
 			            break;
 			        case 'N':
-			            printf("  -> %.2f\n", auxDado->valor.n);
+			            printf("%.2f", auxDado->valor.n);
 			            break;	
 				}
+				if(!auxCol->prox)
+					qtdeDados++;
 				auxDado = auxDado->prox;
 			}
+			
+			x += strlen(auxCol->nome) + 12;
 			auxCol = auxCol->prox;
 		}
+		qtdeDados += 2;
+		qtdeTab++;
 		auxTab = auxTab->prox;
+		x = 3;
+		y += 4;
 	}
+	return y;
 }

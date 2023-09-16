@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<conio2.h>
 #include "tadSql.h"
 
 void createDatabase(TpBancoDeDados **pontBd) {
@@ -44,14 +45,21 @@ void createDatabase(TpBancoDeDados **pontBd) {
 
 int main(void) {
 	TpBancoDeDados *pontBd;
-	char palavra[30];
+	int y;
+	char palavra[30], comandosql[100];
 	createDatabase(&pontBd);
-	mostraTudo(pontBd);
-	inserir(&pontBd->pTabelas);
-	inserir(&pontBd->pTabelas);
-	inserir(&pontBd->pTabelas);
-	inserir(&pontBd->pTabelas);
-	mostraDados(pontBd);
+	y = mostraDados(pontBd);
+	gotoxy(3, y);
+	gets(comandosql);
+	while(strcmp(comandosql, "-1") != 0) {
+		gotoxy(3, y + 1);
+		if (strstr(comandosql, "INSERT INTO"))
+			inserir(&pontBd->pTabelas, comandosql);
+		y = mostraDados(pontBd);
+		gotoxy(3, y);
+		gets(comandosql);
+	}
+	
 	return 0;
 }
 
