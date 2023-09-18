@@ -55,11 +55,12 @@ int main(void) {
 		gotoxy(3, y + 1);
 		if (strstr(comandosql, "INSERT INTO"))
 			inserir(&pontBd->pTabelas, comandosql);
+		if (strstr(comandosql, "SELECT"))
+			mostraSelecionado(pontBd, comandosql);
 		y = mostraDados(pontBd);
 		gotoxy(3, y);
 		gets(comandosql);
 	}
-	
 	return 0;
 }
 

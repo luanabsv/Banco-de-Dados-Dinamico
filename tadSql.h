@@ -323,3 +323,67 @@ int mostraDados(TpBancoDeDados *pBanco) {
 	}
 	return y;
 }
+
+int mostraSelecionado(TpBancoDeDados *pBanco, char string[]) {
+	int x = 3, y = 2, qtdeTab = 0, qtdeDados = 0;
+	char string2[100];
+	gets(string2);
+	TpTabela *auxTab = pBanco->pTabelas;
+	system("cls");
+	while(auxTab) {
+		x = 3;
+		y = (qtdeTab + qtdeDados) + 1;
+		gotoxy(x, y);
+		if(strstr(string2, auxTab->nome) )
+			textcolor(GREEN);
+		else
+			textcolor(WHITE);
+		printf("Tabela: %s", auxTab->nome);
+		textcolor(WHITE);
+		TpColuna *auxCol = auxTab->pCampos;
+		while(auxCol) {
+			y = (qtdeTab + qtdeDados) + 2;
+			gotoxy(x, y);
+			if(strstr(string, auxCol->nome) && strstr(string2, auxTab->nome) || strstr(string, "*") && strstr(string2, auxTab->nome))
+				textcolor(GREEN);
+			else
+				textcolor(WHITE);
+			printf("%s", auxCol->nome);
+			TpDado *auxDado = auxCol->pDados;
+			while(auxDado) {
+				y++;
+				gotoxy(x, y);
+				switch(auxCol->tipo) {
+					case 'T':
+			            printf("%s", auxDado->valor.t);
+			            break;
+			        case 'D':
+			            printf("%s", auxDado->valor.d);
+			            break;
+			        case 'C':
+			            printf("%c", auxDado->valor.c);
+			            break;
+			        case 'I':
+			            printf("%d", auxDado->valor.i);
+			            break;
+			        case 'N':
+			            printf("%.2f", auxDado->valor.n);
+			            break;	
+				}
+				if(!auxCol->prox)
+					qtdeDados++;
+				auxDado = auxDado->prox;
+			}
+			
+			x += strlen(auxCol->nome) + 12;
+			auxCol = auxCol->prox;
+		}
+		qtdeDados += 2;
+		qtdeTab++;
+		auxTab = auxTab->prox;
+		x = 3;
+		y += 4;
+	}
+	getch();
+	return y;
+}
