@@ -46,17 +46,21 @@ void createDatabase(TpBancoDeDados **pontBd) {
 int main(void) {
 	TpBancoDeDados *pontBd;
 	int y;
-	char palavra[30], comandosql[100];
+	char palavra[30], comandosql[100], string1[100], string2[100], string3[100];
 	createDatabase(&pontBd);
 	y = mostraDados(pontBd);
 	gotoxy(3, y);
-	gets(comandosql);
+	gets(comandosql);	
 	while(strcmp(comandosql, "-1") != 0) {
 		gotoxy(3, y + 1);
-		if (strstr(comandosql, "INSERT INTO"))
+		if (teste(comandosql, "INSERT INTO"))
 			inserir(&pontBd->pTabelas, comandosql);
-		if (strstr(comandosql, "SELECT"))
+		if (teste(comandosql, "SELECT"))
 			mostraSelecionado(pontBd, comandosql);
+		if(teste(comandosql, "DELETE"))
+			deletar(&pontBd->pTabelas, comandosql);
+		if(teste(comandosql, "UPDATE"))
+			alterar(&pontBd->pTabelas, comandosql);
 		y = mostraDados(pontBd);
 		gotoxy(3, y);
 		gets(comandosql);
