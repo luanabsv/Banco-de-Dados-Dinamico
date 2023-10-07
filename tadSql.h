@@ -1,7 +1,7 @@
 union unionDados{
 	int i;
 	float n;
-		char c, t[20], d[10];
+	char c, t[20], d[11];
 };
 typedef union unionDados UnionDados;
 
@@ -19,7 +19,7 @@ struct tpColuna {
 typedef struct tpColuna TpColuna;
 
 struct tpTabela {
-	struct TpTabela *ant, *prox;
+	struct tpTabela *ant, *prox;
 	TpColuna *pCampos;
 	char nome[20]; 
 };
@@ -31,22 +31,48 @@ struct tpBanco {
 };
 typedef struct tpBanco TpBancoDeDados;
 
-int teste(char string1[100], char string2[30]) { // Função semelhante ao strstr 
-    int i, j;
+int teste(char string[], char substring[]) {
+	int i = 0, y, j;
+	char c, subaux[strlen(substring)];
+	while(string[i] != '\0') {
+		for (y = 0, j = i; y < strlen(substring); y++, j++)
+			subaux[y] = string[j];
+		subaux[y] = '\0';
+		if(strcmp(subaux, substring) == 0)
+			return 1;
+		i++;
+	}
+	return 0;
+}
 
-    for (i = 0; string1[i] != '\0'; i++) {
-        j = 0;
-
-        while (string1[i + j] == string2[j]) {
-            j++;
-
-            if (string2[j] == '\0') {
-                return 1;
-            }
-        }
-    }
-
-    return 0;
+void retornaDado(char string[], int index, char palavra[]) {
+	int i = 0, len, indexWord = 1, iPalavra = 0;
+	char newPalavra[30];
+	len = strlen(string);
+	
+	while(i < len) {
+		if(string[i] == '(' || string[i] == ',')
+			indexWord++;
+		
+			
+		if(indexWord == index) {
+			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 47 || string[i] == ' ' || string[i] == ':' || string[i] == '-') {
+				newPalavra[iPalavra] = string[i];
+				iPalavra++;
+			}
+		}
+		i++;
+	}
+	newPalavra[iPalavra] = '\0';
+	if (index != 2) {
+		for(i = 0; i < strlen(newPalavra); i++)
+			newPalavra[i] = newPalavra[i + 1];
+		newPalavra[iPalavra] = '\0';
+	}
+	strcpy(palavra, newPalavra);
+	if (indexWord < index) {
+		strcpy(palavra, "-404");
+	}
 }
 
 void retornaPalavra(char string[], int index, char palavra[]) {
@@ -69,8 +95,9 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 	}
 	newPalavra[iPalavra] = '\0';
 	strcpy(palavra, newPalavra);
-	if (indexWord < index)
+	if (indexWord < index) {
 		strcpy(palavra, "-404");
+	}
 }
 
 
@@ -171,7 +198,7 @@ void retornaTipo(char string[], int index, char palavra[]) {
 		
 			
 		if(indexWord == index) {
-			if(string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 40 || string[i] == 41 ) {
+			if(string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 40 || string[i] == 41 || string[i] == '(' || string[i] == ')' || string[i] == ',') {
 				newPalavra[iPalavra] = string[i];
 				iPalavra++;
 			}
@@ -187,7 +214,7 @@ void retornaTipo(char string[], int index, char palavra[]) {
 	strcpy(palavra, newPalavra);	
 }
 
-void newDado(TpDado **pDado, char tipo, UnionDados dado[20]) {
+void newDado(TpDado **pDado, char tipo, char dado[30]) {
 	TpDado *novoDado;
 	TpDado *aux = *pDado;
 	novoDado = (TpDado*)malloc(sizeof(TpDado));
@@ -200,7 +227,7 @@ void newDado(TpDado **pDado, char tipo, UnionDados dado[20]) {
             strcpy(novoDado->valor.d, dado);
             break;
         case 'C':
-            novoDado->valor.c = dado;
+        	novoDado->valor.c = dado[0];
             break;
         case 'I':
             novoDado->valor.i = atoi(dado);
@@ -238,7 +265,7 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
 	} 
-	else if (stricmp(palavra,"NUMERIC") == 0) {
+	else if (stricmp(palavra,"NUMERIC(6,2)") == 0) {
 		novoCampo->tipo = 'N';
 	}
 	else if (stricmp(palavra,"DATE") == 0) {
@@ -261,28 +288,71 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	}
 }
 
-void inserir(TpTabela **pTabelas, char string[]) {
-	getch();
-	char string2[100], campo[20], dado[20], tabela[20];
-	gets(string2);
-	if(teste(string, "INSERT INTO")) {
-		int i = 4;
-		retornaPalavra(string, i, campo);
-		while(strcmp(campo,"-404") != 0) {
-			retornaPalavra(string, 3, tabela);
-			TpTabela *aux = *pTabelas;
-			while(strcmp(aux->nome, tabela) != 0) {
-				aux = aux->prox;
-			}
-			TpColuna *auxCampos = aux->pCampos;
-			while(strcmp(auxCampos->nome, campo) != 0) {
-				auxCampos = auxCampos->prox;
-			}
-			retornaPalavra(string2, i - 2, dado);
-			newDado(&auxCampos->pDados, auxCampos->tipo, dado);
-			i++;
-			retornaPalavra(string, i, campo);
+void quebrainsert(char comando[200], char insert[100], char values[100]) {
+    int i = 0, j, y, indexpalavra = 0;
+    char aux[6], c;
+    strcpy(aux, " ");
+    while (comando[i] != '\0' && strcmp(aux, "values") != 0) {
+        for (j = i, y = 0; y < 6; y++, j++)
+            aux[y] = comando[j];
+        insert[i] = comando[i];
+       	i++;
+    }
+    i -= 2;
+    insert[i] = '\0';
+    i++;
+    while (comando[i] != '\0' && comando[i] != ';') {
+        values[indexpalavra] = comando[i];
+        indexpalavra++;
+        i++;
+    }
+    values[indexpalavra] = '\0';
+}
+
+void quebradelete(char comando[200], char deletar[100], char where[100]) {
+    int i = 0, j, y, indexpalavra = 0;
+    char aux[5], c;
+    strcpy(aux, " ");
+    while (comando[i] != '\0' && strcmp(aux, "WHERE") != 0) {
+        for (j = i, y = 0; y < 5; y++, j++)
+            aux[y] = comando[j];
+        deletar[i] = comando[i];
+       	i++;
+    }
+    i -= 2;
+    deletar[i] = '\0';
+    i++;
+    while (comando[i] != '\0' && comando[i] != ';') {
+        where[indexpalavra] = comando[i];
+        indexpalavra++;
+        i++;
+    }
+    where[indexpalavra] = '\0';
+    printf("%s\n%s", deletar, where);
+    getch();
+}
+
+void inserir(TpTabela **pTabelas, char comandosql[]) {
+	char string2[200], campo[20], dado[20], tabela[20], string[200];
+	quebrainsert(comandosql, string, string2);
+	int i = 4;
+	strcpy(campo," ");
+	printf("\n\n");
+	retornaPalavra(string, 3, tabela);
+	retornaPalavra(string, i, campo);
+	while(strcmp(campo,"-404") != 0) {
+		TpTabela *aux = *pTabelas;
+		while(strcmp(aux->nome, tabela) != 0) {
+			aux = aux->prox;
 		}
+		TpColuna *auxCampos = aux->pCampos;
+		while(strcmp(auxCampos->nome, campo) != 0) {
+			auxCampos = auxCampos->prox;
+		}
+		retornaDado(string2, i - 2, dado);
+		newDado(&auxCampos->pDados, auxCampos->tipo, dado);
+		i++;
+		retornaPalavra(string, i, campo);
 	}
 }
 
@@ -343,21 +413,20 @@ int mostraDados(TpBancoDeDados *pBanco) {
 	return y;
 }
 
-void deletar(TpTabela **pTabela, char string1[]) {
+void deletar(TpTabela **pTabela, char comandosql[]) {
 	int i, j;
 	float valorF;
 	int valorI;
-	char string2[100], palavra[30], condicao_campo[30], condicao_valor[10];
+	char deletarS[100], whereS[100], palavra[30], condicao_campo[30], condicao_valor[10];
 	TpColuna *auxCampos;
 	TpDado *auxDados, *deletar, *anterior;
-	gets(string2);
-	
+	quebradelete(comandosql, deletarS, whereS);
 	TpTabela *aux = *pTabela;
-	retornaPalavra(string1, 3, palavra);
+	retornaPalavra(deletarS, 3, palavra);
 	while(strcmp(aux->nome, palavra) != 0)
 		aux = aux->prox;
-	retornaPalavra(string2, 2, condicao_campo);
-	retornaPalavra(string2, 4, condicao_valor);
+	retornaPalavra(whereS, 2, condicao_campo);
+	retornaPalavra(whereS, 4, condicao_valor);
 	auxCampos = aux->pCampos;
 	while(strcmp(auxCampos->nome, condicao_campo) != 0)
 		auxCampos = auxCampos->prox;
@@ -389,7 +458,7 @@ void deletar(TpTabela **pTabela, char string1[]) {
 			}
 			else {
 				valorI = atoi(condicao_valor);
-				while(auxDados->prox != NULL && auxDados->valor.i != valorI) {
+				while(auxDados != NULL && auxDados->valor.i != valorI) {
 					auxDados = auxDados->prox;
 					i++;
 				}
@@ -405,8 +474,6 @@ void deletar(TpTabela **pTabela, char string1[]) {
 				anterior = auxDados;
 				auxDados = auxDados->prox;	
 			}
-			printf("\n\n%d\n",i);
-			getch();
 			if (i == 0) {
 				deletar = auxDados;
 				
@@ -439,7 +506,7 @@ int mostraSelecionado(TpBancoDeDados *pBanco, char string[]) {
 		x = 3;
 		y = (qtdeTab + qtdeDados) + 1;
 		gotoxy(x, y);
-		if(teste(string2, auxTab->nome))
+		if(strstr(string2, auxTab->nome))
 			textcolor(GREEN);
 		else
 			textcolor(WHITE);
@@ -449,7 +516,7 @@ int mostraSelecionado(TpBancoDeDados *pBanco, char string[]) {
 		while(auxCol) {
 			y = (qtdeTab + qtdeDados) + 2;
 			gotoxy(x, y);
-			if(teste(string, auxCol->nome) && teste(string2, auxTab->nome) || teste(string, "*") && teste(string2, auxTab->nome))
+			if(strstr(string, auxCol->nome) && strstr(string2, auxTab->nome) || strstr(string, "*") && strstr(string2, auxTab->nome))
 				textcolor(GREEN);
 			else
 				textcolor(WHITE);
@@ -494,26 +561,60 @@ int mostraSelecionado(TpBancoDeDados *pBanco, char string[]) {
 		x = 3;
 		y += 4;
 	}
-	getch();
 	return y;
 }
 
-void alterar(TpTabela **pTabela, char string1[]) {
+void quebraupdate(char comando[300], char update[100], char set[100], char where[100]) {
+    int i = 0, j, y, indexpalavra = 0;
+    char aux[8], c;
+    strcpy(aux, " ");
+    while (comando[i] != '\0' && strcmp(aux, "SET") != 0) {
+        for (j = i, y = 0; y < 3; y++, j++)
+            aux[y] = comando[j];
+        aux[y] = '\0';
+        update[i] = comando[i];
+       	i++;
+    }
+    i -= 2;
+    update[i] = '\0';
+    i++;
+    while (comando[i] != '\0' && strcmp(aux, "WHERE") != 0) {
+        for (j = i, y = 0; y < 5; y++, j++)
+            aux[y] = comando[j];
+        aux[y] = '\0';
+        set[indexpalavra] = comando[i];
+        indexpalavra++;
+       	i++;
+    }
+    indexpalavra -= 2;
+    set[indexpalavra] = '\0';
+    i--;
+    indexpalavra = 0;
+    while (comando[i] != '\0' && comando[i] != ';') {
+        where[indexpalavra] = comando[i];
+        indexpalavra++;
+        i++;
+    }
+    where[indexpalavra] = '\0';
+    printf("%s\n%s\n%s", update, set, where);
+    getch();
+}
+
+void alterar(TpTabela **pTabela, char comandosql[]) {
 	float valorF;
 	int valorI, j;
 	TpTabela *aux;
 	TpColuna *auxCampos;
 	TpDado *auxDados;
 	int i, qtde = 0;
-	char string2[100], string3[100], palavra[30], condicao_coluna[30], condicao_valor[20], coluna[30], valor_coluna[20];
-	gets(string2);
-	gets(string3);
-	retornaPalavra(string1, 2, palavra);
+	char update[100], set[100], where[100], palavra[30], condicao_coluna[30], condicao_valor[20], coluna[30], valor_coluna[20];
+	quebraupdate(comandosql, update, set, where);
+	retornaPalavra(update, 2, palavra);
 	aux = *pTabela;
 	while(aux->prox != NULL && strcmp(aux->nome, palavra) != 0)
 		aux = aux->prox;
-	retornaPalavra(string3, 2, condicao_coluna);
-	retornaPalavra(string3, 4, condicao_valor);
+	retornaPalavra(where, 2, condicao_coluna);
+	retornaPalavra(where, 4, condicao_valor);
 	
 	auxCampos = aux->pCampos;
 	while(auxCampos != NULL && strcmp(auxCampos->nome, condicao_coluna) != 0)
@@ -531,7 +632,6 @@ void alterar(TpTabela **pTabela, char string1[]) {
 			qtde++;
 		}
 	}
-	getch();
 	if (auxCampos->tipo == 'N') {
 		valorF = atof(condicao_valor);
 		while(auxDados->prox != NULL && auxDados->valor.n != valorF) {
@@ -541,7 +641,8 @@ void alterar(TpTabela **pTabela, char string1[]) {
 	}
 	if (auxCampos->tipo == 'I') {
 		valorI = atoi(condicao_valor);
-		while(auxDados->prox != NULL && auxDados->valor.n != valorI) {
+		while(auxDados->prox != NULL && auxDados->valor.i != valorI) {
+			printf("a");
 			auxDados = auxDados->prox;
 			qtde++;
 		}
@@ -555,8 +656,8 @@ void alterar(TpTabela **pTabela, char string1[]) {
 
 	auxCampos = aux->pCampos;
 	i = 2;
-	retornaPalavra(string2, i, coluna);
-	retornaPalavra(string2, i + 2, valor_coluna);
+	retornaPalavra(set, i, coluna);
+	retornaPalavra(set, i + 2, valor_coluna);
 	while(auxCampos != NULL && stricmp(coluna, "-404") != 0) {
 		if(strcmp(auxCampos->nome, coluna) == 0) {
 			auxDados = auxCampos->pDados;
@@ -580,9 +681,20 @@ void alterar(TpTabela **pTabela, char string1[]) {
 				auxDados->valor.c = valor_coluna;
 			}
 			i += 3;
-			retornaTipo(string2, i, coluna);
-			retornaTipo(string2, i + 2, valor_coluna);
+			retornaPalavra(set, i, coluna);
+			retornaDado(set, i + 2, valor_coluna);
 		}
 		auxCampos = auxCampos->prox;
 	}
+	getch();
 }
+
+void telacheia() {
+	keybd_event ( VK_MENU, 0x38, 0, 0 );
+	keybd_event ( VK_SPACE, 0x39, 0, 0 );
+	keybd_event(0x58,0,0,0);
+	keybd_event ( VK_MENU, 0x38, KEYEVENTF_KEYUP, 0 );
+	keybd_event ( VK_SPACE, 0x39, KEYEVENTF_KEYUP, 0 );
+	keybd_event(0x58,0,KEYEVENTF_KEYUP,0);
+}
+

@@ -2,10 +2,11 @@
 #include<string.h>
 #include<stdlib.h>
 #include<conio2.h>
+#include<windows.h>
 #include "tadSql.h"
 
 void createDatabase(TpBancoDeDados **pontBd) {
-	FILE *ptrArq = fopen("comandoBanco2.txt", "r");
+	FILE *ptrArq = fopen("scriptdboficina.txt", "r");
 	TpTabela *tabelaAtual = NULL;
 	char string[100], string2[100], palavra[30];
 	
@@ -44,21 +45,23 @@ void createDatabase(TpBancoDeDados **pontBd) {
 }
 
 int main(void) {
+	telacheia();
+	Sleep(1000);
 	TpBancoDeDados *pontBd;
 	int y;
-	char palavra[30], comandosql[100], string1[100], string2[100], string3[100];
+	char palavra[30], comandosql[600], string1[200], string2[200], string3[200];
 	createDatabase(&pontBd);
 	y = mostraDados(pontBd);
 	gotoxy(3, y);
-	gets(comandosql);	
+	gets(comandosql);
 	while(strcmp(comandosql, "-1") != 0) {
 		gotoxy(3, y + 1);
 		if (teste(comandosql, "INSERT INTO"))
 			inserir(&pontBd->pTabelas, comandosql);
-		if (teste(comandosql, "SELECT"))
-			mostraSelecionado(pontBd, comandosql);
-		if(teste(comandosql, "DELETE"))
-			deletar(&pontBd->pTabelas, comandosql);
+	//	if (teste(comandosql, "SELECT"))
+	//		mostraSelecionado(pontBd, comandosql);
+	//	if(teste(comandosql, "DELETE"))
+	//		deletar(&pontBd->pTabelas, comandosql);
 		if(teste(comandosql, "UPDATE"))
 			alterar(&pontBd->pTabelas, comandosql);
 		y = mostraDados(pontBd);
