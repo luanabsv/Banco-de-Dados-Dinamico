@@ -21,12 +21,12 @@ void createDatabase(TpBancoDeDados **pontBd) {
 			*pontBd = newDatabase(palavra);
 		}
 		
-	if(strstr(string, "CREATE TABLE")) {
+	if(teste(string, "CREATE TABLE")) {
 			retornaPalavra(string, 3, palavra);
 			tabelaAtual = newTable(&(*pontBd)->pTabelas, palavra);
 			fscanf(ptrArq, "%[^\n]\n", string);
 			while(strcmp(string,");") != 0) {
-				if(strstr(string, "PRIMARY KEY")) {
+				if(teste(string, "PRIMARY KEY")) {
 					definePk(&tabelaAtual, string);
 				}
 				else {
@@ -35,7 +35,7 @@ void createDatabase(TpBancoDeDados **pontBd) {
 				fscanf(ptrArq, "%[^\n]\n", string); 
 			}
 		}
-		if(strstr(string,"ALTER TABLE" )) {
+		if(teste(string,"ALTER TABLE" )) {
 			fscanf(ptrArq, "%[^\n]\n", string2); 
 			defineFk(*pontBd, string, string2);
 		}
@@ -53,21 +53,22 @@ int main(void) {
 	createDatabase(&pontBd);
 	y = mostraDados(pontBd);
 	gotoxy(3, y);
+	printf("Comando SQL: ");
 	gets(comandosql);
 	while(strcmp(comandosql, "-1") != 0) {
 		gotoxy(3, y + 1);
 		if (teste(comandosql, "INSERT INTO"))
 			inserir(&pontBd->pTabelas, comandosql);
-	//	if (teste(comandosql, "SELECT"))
-	//		mostraSelecionado(pontBd, comandosql);
-	//	if(teste(comandosql, "DELETE"))
-	//		deletar(&pontBd->pTabelas, comandosql);
+		if (teste(comandosql, "SELECT"))
+			mostraSelecionado(pontBd, comandosql);
+		if(teste(comandosql, "DELETE"))
+			deletar(&pontBd->pTabelas, comandosql);
 		if(teste(comandosql, "UPDATE"))
 			alterar(&pontBd->pTabelas, comandosql);
 		y = mostraDados(pontBd);
 		gotoxy(3, y);
+		printf("Comando SQL: ");
 		gets(comandosql);
 	}
 	return 0;
 }
-

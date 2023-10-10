@@ -16,6 +16,4 @@ INSERT INTO medico (crm, nome, cpf, celular, dt_nascimento)
 VALUES (345, doglinha, 345, 189910021, 12/04/1989)
 INSERT INTO consulta (cpf_paciente, crm_medico, id_consulta, dt_consulta, dt_retorno)
 VALUES (345, 345, 39203, 20/09/2023, 23/09/2023)
-UPDATE medico
-SET nome = marcolas, celular = 40028922, dt_nascimento = 20/09/2004
-WHERE crm = 345
+UPDATE veiculo SET marca = Dodge, dono = Marcinho Matador, chassi = testando apenas WHERE id_veiculo = 3

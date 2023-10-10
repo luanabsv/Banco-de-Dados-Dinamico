@@ -31,6 +31,12 @@ struct tpBanco {
 };
 typedef struct tpBanco TpBancoDeDados;
 
+struct tpString {
+	char string[100];
+	struct tpString *prox;
+};
+typedef struct tpString TpString;
+
 int teste(char string[], char substring[]) {
 	int i = 0, y, j;
 	char c, subaux[strlen(substring)];
@@ -80,13 +86,13 @@ void retornaPalavra(char string[], int index, char palavra[]) {
 	char newPalavra[30];
 	len = strlen(string);
 	
-	while(i < len) {
+	while(string[i] != '\0') {
 		if(string[i] == ' ')
 			indexWord++;
 		
 			
 		if(indexWord == index) {
-			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 47) {
+			if(string[i] != 40 && string[i] != 41 && string[i] >= 65 && string[i] <= 90 || string[i] >= 97 && string[i] <= 122 || isdigit(string[i]) || string[i] == 95 || string[i] == 45 || string[i] == 47 || string[i] == '_') {
 				newPalavra[iPalavra] = string[i];
 				iPalavra++;
 			}
@@ -236,8 +242,9 @@ void newDado(TpDado **pDado, char tipo, char dado[30]) {
             novoDado->valor.n = atof(dado);
             break;
 	}
-	if(*pDado == NULL)
+	if(*pDado == NULL) {
 		*pDado = novoDado;
+	}	
 	else {
 		while(aux->prox)
 			aux = aux->prox;
@@ -259,8 +266,7 @@ void newCampo(TpColuna **pCampos, char string[]) {
 	novoCampo->prox = NULL;
 	novoCampo->fk = NULL;
 	novoCampo->pk = 'N';
-	novoCampo->pDados = NULL;
-	novoCampo->pAtual = NULL;
+	novoCampo->pDados = novoCampo->pAtual = NULL;
 	retornaTipo(string, 2, palavra);
 	if (strcmp(palavra,"INTEGER") == 0) {
 		novoCampo->tipo = 'I';
@@ -351,6 +357,7 @@ void inserir(TpTabela **pTabelas, char comandosql[]) {
 		}
 		retornaDado(string2, i - 2, dado);
 		newDado(&auxCampos->pDados, auxCampos->tipo, dado);
+		auxCampos->pAtual = auxCampos->pDados;
 		i++;
 		retornaPalavra(string, i, campo);
 	}
@@ -364,20 +371,24 @@ int mostraDados(TpBancoDeDados *pBanco) {
 		x = 3;
 		y = (qtdeTab + qtdeDados) + 1;
 		gotoxy(x, y);
-		printf("Tabela: %s", auxTab->nome);
+		printf("%s", auxTab->nome);
 		TpColuna *auxCol = auxTab->pCampos;
 		while(auxCol) {
-			y = (qtdeTab + qtdeDados) + 2;
+			y = (qtdeTab + qtdeDados) + 3;
+			gotoxy(x, y);
+			retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
 			gotoxy(x, y);
 			if(auxCol->fk != NULL)
-				printf("%s (FK)(%c)", auxCol->nome, auxCol->tipo);
+				printf(" %s (FK)(%c)", auxCol->nome, auxCol->tipo);
 			else if (auxCol->pk == 'S')
-				printf("%s (PK)(%c)", auxCol->nome, auxCol->tipo);
+				printf(" %s (PK)(%c)", auxCol->nome, auxCol->tipo);
 				else
-					printf("%s (%c)", auxCol->nome, auxCol->tipo);
+					printf(" %s (%c)", auxCol->nome, auxCol->tipo);
 			TpDado *auxDado = auxCol->pDados;
 			while(auxDado) {
-				y++;
+				y += 2;
+				gotoxy(x, y);
+				retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
 				gotoxy(x, y);
 				switch(auxCol->tipo) {
 					case 'T':
@@ -397,19 +408,19 @@ int mostraDados(TpBancoDeDados *pBanco) {
 			            break;	
 				}
 				if(!auxCol->prox)
-					qtdeDados++;
+					qtdeDados += 2;
 				auxDado = auxDado->prox;
 			}
 			
 			x += strlen(auxCol->nome) + 12;
 			auxCol = auxCol->prox;
 		}
-		qtdeDados += 2;
+		qtdeDados += 4;
 		qtdeTab++;
 		auxTab = auxTab->prox;
-		x = 3;
-		y += 4;
 	}
+	
+	y+=3;
 	return y;
 }
 
@@ -497,70 +508,246 @@ void deletar(TpTabela **pTabela, char comandosql[]) {
 	}
 }
 
-int mostraSelecionado(TpBancoDeDados *pBanco, char string[]) {
-	int x = 3, y = 2, string2[100], qtdeTab = 0, qtdeDados = 0;
-	gets(string2);
+void quebraselect(char comando[200], char select[100], char from[100], char where[100]) {
+    int i = 0, j, y, x, indexpalavra = 0;
+    char aux[6], c;
+    strcpy(aux, " ");
+    while (comando[i] != '\0' && strcmp(aux, "FROM") != 0) {
+        for (j = i, y = 0; y < 4; y++, j++)
+            aux[y] = comando[j];
+        aux[y] = '\0';
+        select[i] = comando[i];
+       	i++;
+    }
+    i -= 1;
+    select[i] = '\0';
+    x = 0;
+    while (comando[i] != '\0' && strcmp(aux, "WHERE") != 0) {
+        for (j = i, y = 0; y < 5; y++, j++)
+            aux[y] = comando[j];
+        aux[y] = '\0';
+        from[x] = comando[i];
+       	i++;
+       	x++;
+    }
+    from[x] = '\0';
+    x = 0;
+    i -= 1;
+    while (comando[i] != '\0') {
+        for (j = i, y = 0; y < 5; y++, j++)
+            aux[y] = comando[j];
+        aux[y] = '\0';
+        where[x] = comando[i];
+       	i++;
+       	x++;
+    }
+    i -= 1;
+    where[x] = '\0';
+}
+
+int isInside(char string[], TpString *listaString) {
+	while(listaString->prox && strcmp(string, listaString->string) != 0) {
+		listaString = listaString->prox;
+	}
+	if (strcmp(string, listaString->string) == 0)
+		return 1;
+	return 0;
+}
+
+int mostraSelecionado(TpBancoDeDados *pBanco, char comandosql[]) {
+	int x = 3, y = 2, select[200], from[200], where[200], qtdeTab = 0, qtdeDados = 0, minI, maxI, valorC;
+	quebraselect(comandosql, select, from, where);
+	TpString *listaSelect = NULL, *listaFrom = NULL;
 	TpTabela *auxTab = pBanco->pTabelas;
+	TpColuna *auxBet = auxTab->pCampos;
+	TpDado *auxBetC = auxBet->pDados;
 	system("cls");
-	while(auxTab) {
-		x = 3;
-		y = (qtdeTab + qtdeDados) + 1;
-		gotoxy(x, y);
-		if(strstr(string2, auxTab->nome))
-			textcolor(GREEN);
-		else
-			textcolor(WHITE);
-		printf("Tabela: %s", auxTab->nome);
-		textcolor(WHITE);                  
-		TpColuna *auxCol = auxTab->pCampos;
-		while(auxCol) {
-			y = (qtdeTab + qtdeDados) + 2;
+	char aux[100], campoBet[20];
+	int i = 2;
+	TpString *novaCaixa, *auxLista;
+	retornaPalavra(select, i, aux);
+	while(strcmp(aux, "-404") != 0) {
+		novaCaixa = (TpString*)malloc(sizeof(TpString));
+		novaCaixa->prox = NULL;
+		strcpy(novaCaixa->string, aux);
+		if (listaSelect == NULL)
+			listaSelect = novaCaixa;
+		else {
+			auxLista = listaSelect;
+			while (auxLista->prox != NULL)
+				auxLista = auxLista->prox;
+			auxLista->prox = novaCaixa;
+		}
+		i++;
+		retornaPalavra(select, i, aux);
+	}
+	i = 2;
+	retornaPalavra(from, i, aux);
+	while(strcmp(aux, "-404") != 0) {
+		novaCaixa = (TpString*)malloc(sizeof(TpString));
+		novaCaixa->prox = NULL;
+		strcpy(novaCaixa->string, aux);
+		if (listaFrom == NULL)
+			listaFrom = novaCaixa;
+		else {
+			auxLista = listaFrom;
+			while (auxLista->prox != NULL)
+				auxLista = auxLista->prox;
+			auxLista->prox = novaCaixa;
+		}
+		i++;
+		retornaPalavra(from, i, aux);
+	}
+	if (strcmp(where, ";") == 0)
+		while(auxTab) {
+			x = 3;
+			y = (qtdeTab + qtdeDados) + 1;
 			gotoxy(x, y);
-			if(strstr(string, auxCol->nome) && strstr(string2, auxTab->nome) || strstr(string, "*") && strstr(string2, auxTab->nome))
-				textcolor(GREEN);
+			if(isInside(auxTab->nome, listaFrom))
+				textcolor(CYAN);
 			else
 				textcolor(WHITE);
-			if(auxCol->fk != NULL)
-				printf("%s (FK)(%c)", auxCol->nome, auxCol->tipo);
-			else if (auxCol->pk == 'S')
-				printf("%s (PK)(%c)", auxCol->nome, auxCol->tipo);
-				else
-					printf("%s (%c)", auxCol->nome, auxCol->tipo);
-			TpDado *auxDado = auxCol->pDados;
-			while(auxDado) {
-				y++;
+			printf("%s", auxTab->nome);
+			textcolor(WHITE);                  
+			TpColuna *auxCol = auxTab->pCampos;
+			while(auxCol) {
+				y = (qtdeTab + qtdeDados) + 3;
 				gotoxy(x, y);
-				switch(auxCol->tipo) {
-					case 'T':
-			            printf("%s", auxDado->valor.t);
-			            break;
-			        case 'D':
-			            printf("%s", auxDado->valor.d);
-			            break;
-			        case 'C':
-			            printf("%c", auxDado->valor.c);
-			            break;
-			        case 'I':
-			            printf("%d", auxDado->valor.i);
-			            break;
-			        case 'N':
-			            printf("%.2f", auxDado->valor.n);
-			            break;	
+				if(isInside(auxCol->nome, listaSelect) && isInside(auxTab->nome, listaFrom) || teste(select, "*") && isInside(auxTab->nome, listaFrom))
+					textcolor(CYAN);
+				else
+					textcolor(WHITE);
+				retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
+					gotoxy(x, y);
+				if(auxCol->fk != NULL)
+					printf("%s (FK)(%c)", auxCol->nome, auxCol->tipo);
+				else if (auxCol->pk == 'S')
+					printf("%s (PK)(%c)", auxCol->nome, auxCol->tipo);
+					else
+						printf("%s (%c)", auxCol->nome, auxCol->tipo);
+				TpDado *auxDado = auxCol->pDados;
+				while(auxDado) {
+					y+=2;
+					gotoxy(x, y);
+					retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
+					gotoxy(x, y);
+					switch(auxCol->tipo) {
+						case 'T':
+				            printf("%s", auxDado->valor.t);
+				            break;
+				        case 'D':
+				            printf("%s", auxDado->valor.d);
+				            break;
+				        case 'C':
+				            printf("%c", auxDado->valor.c);
+				            break;
+				        case 'I':
+				            printf("%d", auxDado->valor.i);
+				            break;
+				        case 'N':
+				            printf("%.2f", auxDado->valor.n);
+				            break;	
+					}
+					if(!auxCol->prox)
+						qtdeDados+=2;
+					auxDado = auxDado->prox;
 				}
-				if(!auxCol->prox)
-					qtdeDados++;
-				auxDado = auxDado->prox;
+				
+				x += strlen(auxCol->nome) + 12;
+				auxCol = auxCol->prox;
 			}
-			
-			x += strlen(auxCol->nome) + 12;
-			auxCol = auxCol->prox;
+			qtdeDados += 4;
+			qtdeTab++;
+			auxTab = auxTab->prox;
 		}
-		qtdeDados += 2;
-		qtdeTab++;
-		auxTab = auxTab->prox;
-		x = 3;
-		y += 4;
+	else {
+		retornaPalavra(where, 2, campoBet);
+		retornaPalavra(where, 4, aux);
+		minI = atoi(aux);
+		retornaPalavra(where, 6, aux);
+		maxI = atoi(aux);
+		
+		while(strcmp(auxBet->nome, campoBet) != 0)
+			auxBet = auxBet->prox;
+		while(auxTab) {
+			x = 3;
+			y = (qtdeTab + qtdeDados) + 1;
+			gotoxy(x, y);
+			if(isInside(auxTab->nome, listaFrom))
+				textcolor(CYAN);
+			else
+				textcolor(WHITE);
+			printf("%s", auxTab->nome);
+			textcolor(WHITE);                  
+			TpColuna *auxCol = auxTab->pCampos;
+			while(auxCol) {
+				auxBetC = auxBet->pDados;
+				y = (qtdeTab + qtdeDados) + 3;
+				gotoxy(x, y);
+				if(isInside(auxCol->nome, listaSelect) && isInside(auxTab->nome, listaFrom) || teste(select, "*") && isInside(auxTab->nome, listaFrom))
+					textcolor(CYAN);
+				else
+					textcolor(WHITE);
+				retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
+					gotoxy(x, y);
+				if(auxCol->fk != NULL)
+					printf("%s (FK)(%c)", auxCol->nome, auxCol->tipo);
+				else if (auxCol->pk == 'S')
+					printf("%s (PK)(%c)", auxCol->nome, auxCol->tipo);
+					else
+						printf("%s (%c)", auxCol->nome, auxCol->tipo);
+				TpDado *auxDado = auxCol->pDados;
+				while(auxDado) {
+					if(isInside(auxCol->nome, listaSelect) && isInside(auxTab->nome, listaFrom) && auxBetC->valor.i >= minI && auxBetC->valor.i <= maxI || strcmp(select, "SELECT * ") == 0 && auxBetC->valor.i >= minI && auxBetC->valor.i <= maxI)
+						textcolor(CYAN);
+					else
+						textcolor(WHITE);
+					y+=2;
+					gotoxy(x, y);
+					retangulo(x - 1, y - 1, strlen(auxCol->nome) + 10, 1);
+					gotoxy(x, y);
+					switch(auxCol->tipo) {
+						case 'T':
+				            printf("%s", auxDado->valor.t);
+				            break;
+				        case 'D':
+				            printf("%s", auxDado->valor.d);
+				            break;
+				        case 'C':
+				            printf("%c", auxDado->valor.c);
+				            break;
+				        case 'I':
+				            printf("%d", auxDado->valor.i);
+				            break;
+				        case 'N':
+				            printf("%.2f", auxDado->valor.n);
+				            break;	
+					}
+					textcolor(WHITE);
+					if(!auxCol->prox)
+						qtdeDados+=2;
+					auxDado = auxDado->prox;
+					auxBetC = auxBetC->prox;
+				}
+				
+				x += strlen(auxCol->nome) + 12;
+				auxCol = auxCol->prox;
+			}
+			qtdeDados += 4;
+			qtdeTab++;
+			auxTab = auxTab->prox;
+		}
 	}
+	y+=3;
+	textcolor(CYAN);
+	gotoxy(x, y);
+	printf("===============================");
+	gotoxy(x, y + 1);
+	printf("{ Pressione Enter para voltar }");
+	gotoxy(x, y + 2);
+	printf("===============================");
+	getch();
+	textcolor(WHITE);
 	return y;
 }
 
@@ -642,7 +829,6 @@ void alterar(TpTabela **pTabela, char comandosql[]) {
 	if (auxCampos->tipo == 'I') {
 		valorI = atoi(condicao_valor);
 		while(auxDados->prox != NULL && auxDados->valor.i != valorI) {
-			printf("a");
 			auxDados = auxDados->prox;
 			qtde++;
 		}
@@ -678,15 +864,14 @@ void alterar(TpTabela **pTabela, char comandosql[]) {
 				auxDados->valor.i = valorI;
 			}
 			if (auxCampos->tipo == 'C') {
-				auxDados->valor.c = valor_coluna;
+				auxDados->valor.c = valor_coluna[0];
 			}
 			i += 3;
 			retornaPalavra(set, i, coluna);
-			retornaDado(set, i + 2, valor_coluna);
+			retornaPalavra(set, i + 2, valor_coluna);
 		}
 		auxCampos = auxCampos->prox;
 	}
-	getch();
 }
 
 void telacheia() {
@@ -698,3 +883,37 @@ void telacheia() {
 	keybd_event(0x58,0,KEYEVENTF_KEYUP,0);
 }
 
+// Desenhos
+
+#define X_MAX 150
+#define LINHAH 196
+#define LINHAV 179
+#define BORDASE 218
+#define BORDASD 191
+#define BORDAIE 192
+#define BORDAID 217
+
+void retangulo(int x, int y, int BASERETANGULO, int ALTURARETANGULO) {
+	int i, j;
+	gotoxy(x, y);
+	printf("%c", BORDASE);
+	for(i = 0; i < BASERETANGULO; i++) {
+		printf("%c", LINHAH);
+	}
+	printf("%c\n", BORDASD);
+	
+	for(i = 0; i < ALTURARETANGULO; i++) {
+		gotoxy(x, ++y);
+		printf("%c", LINHAV);
+		for(j = 0; j < BASERETANGULO; j++)
+			printf(" ");
+		printf("%c\n", LINHAV);
+	}
+	
+	gotoxy(x, ++y);
+	printf("%c", BORDAIE);
+	for(i = 0; i < BASERETANGULO; i++) {
+		printf("%c", LINHAH);
+	}
+	printf("%c", BORDAID);
+}
