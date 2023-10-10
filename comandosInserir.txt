@@ -1,19 +1,49 @@
-INSERT INTO paciente (nome, cpf, celular, dt_nascimento)
-VALUES (marcio, 123, 1892, 12/04/1992)
-INSERT INTO medico (crm, nome, cpf, celular, dt_nascimento)
-VALUES (123, douglas, 123, 18991002112, 12/04/1989)
-INSERT INTO consulta (cpf_paciente, crm_medico, id_consulta, dt_consulta, dt_retorno)
-VALUES (123, 123, 39203, 20/09/2023, 23/09/2023)
-INSERT INTO paciente (nome, cpf, celular, dt_nascimento)
-VALUES (luigi, 234, 1899202112, 12/04/1992)
-INSERT INTO medico (crm, nome, cpf, celular, dt_nascimento)
-VALUES (234, fabio, 234, 18991, 12/04/1989)
-INSERT INTO consulta (cpf_paciente, crm_medico, id_consulta, dt_consulta, dt_retorno)
-VALUES (234, 234, 39203, 20/09/2023, 23/09/2023)
-INSERT INTO paciente (nome, cpf, celular, dt_nascimento)
-VALUES (rafinha, 345, 1899202112, 12/04/1992)
-INSERT INTO medico (crm, nome, cpf, celular, dt_nascimento)
-VALUES (345, doglinha, 345, 189910021, 12/04/1989)
-INSERT INTO consulta (cpf_paciente, crm_medico, id_consulta, dt_consulta, dt_retorno)
-VALUES (345, 345, 39203, 20/09/2023, 23/09/2023)
-UPDATE veiculo SET marca = Dodge, dono = Marcinho Matador, chassi = testando apenas WHERE id_veiculo = 3
+INSERT INTO cliente (id_cliente, nome, email, telefone, data_registro) values (1, Zeca Perigoso, zeca@gmail.com, 18996364963, 20/09/2023);
+
+INSERT INTO cliente (id_cliente, nome, email, telefone, data_registro) values (2, Marcio, marcio@gmail.com, 18996045279, 19/09/2023);
+
+INSERT INTO cliente (id_cliente, nome, email, telefone, data_registro) values (3, Iago, iago@gmail.com, 18993827583, 18/09/2023);
+
+INSERT INTO cliente (id_cliente, nome, email, telefone, data_registro) values (4, Maria Eduarda, maria@gmail.com, 18992857283, 17/09/2023);
+
+INSERT INTO produto (id_produto, nome, categoria, estoque, preco) values (1, Arroz, Cereal, 10, 10,00);
+
+INSERT INTO produto (id_produto, nome, categoria, estoque, preco) values (2, Feijao, Cereal, 3, 5,00);
+
+INSERT INTO produto (id_produto, nome, categoria, estoque, preco) values (3, Milho, Cereal, 20, 2,00);
+
+INSERT INTO produto (id_produto, nome, categoria, estoque, preco) values (4, Abacaxi, Fruta, 30, 30,00);
+
+INSERT INTO compras (id_compra, id_cliente, id_produto, quantidade, data_compra, status, total) values (1, 3, 2, 20, 20/09/2023, concluida, 100,00);
+
+INSERT INTO compras (id_compra, id_cliente, id_produto, quantidade, data_compra, status, total) values (2, 1, 3, 10, 21/09/2023, concluida, 300,00);
+
+INSERT INTO compras (id_compra, id_cliente, id_produto, quantidade, data_compra, status, total) values (3, 2, 1, 30, 22/09/2023, concluida, 500,00);
+
+INSERT INTO compras (id_compra, id_cliente, id_produto, quantidade, data_compra, status, total) values (4, 4, 4, 200, 23/09/2023, pendente, 5000,00);
+
+INSERT INTO compras (id_compra, id_cliente, id_produto, quantidade, data_compra, status, total) values (5, 1, 3, 150, 27/09/2023, pendente, 250,00);
+
+UPDATE compras SET quantidade = 40 WHERE id_compra = 1;
+
+UPDATE compras SET quantidade = 10, total = 400 WHERE id_compra = 3;
+
+SELECT * FROM produto;
+
+SELECT * FROM produto WHERE estoque BETWEEN 10 AND 25;
+
+SELECT id_produto, nome, estoque FROM produto WHERE estoque BETWEEN 1 AND 10;
+
+SELECT * FROM cliente WHERE id_cliente = 3;
+
+SELECT * FROM compras WHERE status = concluida;
+
+SELECT * FROM compras WHERE status = pendente;
+
+SELECT id_compra, data_compra, total FROM compras WHERE total BETWEEN 1 AND 300;
+
+DELETE FROM cliente WHERE id_cliente = 4;
+
+DELETE FROM cliente WHERE id_cliente = 2;
+
+DELETE FROM cliente WHERE id_cliente = 1;

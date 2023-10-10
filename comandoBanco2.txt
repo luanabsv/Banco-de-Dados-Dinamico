@@ -1,30 +1,35 @@
-CREATE DATABASE db_hospital;
-CREATE TABLE paciente (
+CREATE DATABASE db_supermercado;
+
+CREATE TABLE cliente (
+ id_cliente INTEGER NOT NULL ,
  nome CHARACTER(20) ,
- cpf CHARACTER(20) ,
- celular CHARACTER(20) ,
- dt_nascimento DATE ,
- CONSTRAINT PK_paciente PRIMARY KEY (cpf)
+ email CHARACTER(20) ,
+ telefone CHARACTER(20) ,
+ data_registro DATE ,
+ CONSTRAINT PK_cliente PRIMARY KEY (id_cliente)
 );
 
-CREATE TABLE consulta (
- cpf_paciente CHARACTER(20) NOT NULL,
- crm_medico INTEGER NOT NULL,
- id_consulta INTEGER NOT NULL,
- dt_consulta DATE ,
- dt_retorno DATE ,
- CONSTRAINT PK_consulta PRIMARY KEY (id_consulta)
+CREATE TABLE produto (
+ id_produto INTEGER NOT NULL ,
+ nome CHARACTER(20) ,
+ categoria CHARACTER(20) ,
+ estoque INTEGER ,
+ preco NUMERIC(6,2) ,
+ CONSTRAINT PK_produto PRIMARY KEY (id_produto)
 );
 
-CREATE TABLE medico (
- crm INTEGER NOT NULL,
- nome CHARACTER(20) ,
- cpf CHARACTER(20) ,
- celular CHARACTER(20) ,
- dt_nascimento DATE ,
- CONSTRAINT PK_medico PRIMARY KEY (crm)
+CREATE TABLE compras (
+ id_compra INTEGER NOT NULL ,
+ id_cliente INTEGER ,
+ id_produto INTEGER ,
+ quantidade INTEGER ,
+ data_compra DATE ,
+ status CHARACTER(20) ,
+ total NUMERIC(6,2) ,
+ CONSTRAINT PK_compras PRIMARY KEY (id_compra) ,
 );
-ALTER TABLE consulta ADD CONSTRAINT fk_consulta_paciente
- FOREIGN KEY (cpf_paciente) REFERENCES paciente (cpf),
-ALTER TABLE consulta ADD CONSTRAINT fk_consulta_medico
- FOREIGN KEY (crm_medico) REFERENCES medico (crm),
+
+ALTER TABLE compras ADD CONSTRAINT cliente_compra
+ FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente);
+ALTER TABLE compras ADD CONSTRAINT produto_compra
+ FOREIGN KEY (id_produto) REFERENCES produto (id_produto);

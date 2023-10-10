@@ -62,6 +62,8 @@ SELECT id_veiculo, modelo, placa, ano, dono FROM veiculo WHERE ano BETWEEN 1970 
 
 SELECT * FROM peca;
 
+SELECT * FROM os_peca WHERE valor BETWEEN 1 AND 10000;
+
 SELECT * FROM peca WHERE estoque BETWEEN 3 AND 10;
 
 SELECT id_peca, descricao, valor, estoque FROM peca;
