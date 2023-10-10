@@ -26,13 +26,13 @@ INSERT INTO ordem_servico (id_os, id_veiculo, km_entrada, data_entrada, hora_ent
 
 INSERT INTO os_peca (id_os, id_peca, quantidade, valor) values (1, 2, 1, 96.00);
 
-INSERT INTO os_peca (id_os, id_peca, quantidade, valor) values (1, 10, 4, 32.00);
+INSERT INTO os_peca (id_os, id_peca, quantidade, valor) values (2, 10, 4, 32.00);
 
-INSERT INTO os_peca (id_os, id_peca, quantidade, valor) values (1, 4, 1, 95.70);
+INSERT INTO os_peca (id_os, id_peca, quantidade, valor) values (3, 4, 1, 95.70);
 
 INSERT INTO os_servico (id_os, id_servico, valor) values (1, 5, 25.00);
 
-INSERT INTO os_servico (id_os, id_servico, valor) values (1, 2, 100.00);
+INSERT INTO os_servico (id_os, id_servico, valor) values (2, 2, 100.00);
 
 INSERT INTO ordem_servico (id_os, id_veiculo, km_entrada, data_entrada, hora_entrada, data_saida, hora_saida, valor_total) values (2, 1, 95000, '2023-10-01', '08:10', '2023-10-04', '17:00', 1196.00);
 

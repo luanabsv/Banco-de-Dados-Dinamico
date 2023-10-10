@@ -6,7 +6,7 @@
 #include "tadSql.h"
 
 void createDatabase(TpBancoDeDados **pontBd) {
-	FILE *ptrArq = fopen("comandoBanco2.txt", "r");
+	FILE *ptrArq = fopen("scriptdboficina.txt", "r");
 	TpTabela *tabelaAtual = NULL;
 	char string[100], string2[100], palavra[30];
 	
