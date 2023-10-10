@@ -6,7 +6,7 @@
 #include "tadSql.h"
 
 void createDatabase(TpBancoDeDados **pontBd) {
-	FILE *ptrArq = fopen("scriptdboficina.txt", "r");
+	FILE *ptrArq = fopen("comandoBanco2.txt", "r");
 	TpTabela *tabelaAtual = NULL;
 	char string[100], string2[100], palavra[30];
 	
@@ -16,7 +16,7 @@ void createDatabase(TpBancoDeDados **pontBd) {
 	
 	fscanf(ptrArq, "%[^\n]\n", string);
 	while(!feof(ptrArq)) {
-		if(strstr(string, "CREATE DATABASE")) {
+		if(teste(string, "CREATE DATABASE")) {
 			retornaPalavra(string, 3, palavra);
 			*pontBd = newDatabase(palavra);
 		}
